@@ -1,0 +1,310 @@
+#include<iostream>
+#include<string.h>
+using namespace std;
+class AVLTreeNode
+{
+   private:
+      int num;
+      char name[50];
+      float price;
+      AVLTreeNode *left;
+      AVLTreeNode *right;
+      int height;
+   public:
+      friend class AVLTree;
+      AVLTreeNode();
+      void getDetails();
+      void displayDetails();
+};
+class AVLTree
+{
+   private:
+      AVLTreeNode *root;
+   public:
+      AVLTree();
+      ~AVLTree();
+      AVLTreeNode *getRoot();
+      void inorder(AVLTreeNode *);
+      int isEmpty();
+      void preorder(AVLTreeNode *);
+      void postorder(AVLTreeNode *);
+      AVLTreeNode *LLRotate(AVLTreeNode *);
+      AVLTreeNode *RRRotate(AVLTreeNode *);
+      AVLTreeNode *LRRotate(AVLTreeNode *);
+      AVLTreeNode *RLRotate(AVLTreeNode *);
+      int getHeight(AVLTreeNode *);
+      int BF(AVLTreeNode *);
+      int displayDetails();
+      AVLTreeNode *insert(AVLTreeNode *,AVLTreeNode *);
+      void insertion(AVLTreeNode*);
+      AVLTreeNode *search(int);
+      AVLTreeNode *findMin(AVLTreeNode *);
+      AVLTreeNode *findMax(AVLTreeNode *);
+
+};
+#include"head.h"
+AVLTreeNode::AVLTreeNode()
+{
+   num = 0;
+   strcpy(name," ");
+   price = 0.0;
+   left = NULL;
+   right = NULL;
+}
+void AVLTreeNode::getDetails()
+{
+   cout << "Enter no:";
+   cin >> num;
+   cout << "Enter VehicleName:";
+   cin >> name;
+   cout << "Enter Vehicleprice:";
+   cin >> price;
+}
+void AVLTreeNode::displayDetails()
+{
+   cout << "Vehicle number:" << num << "\n";
+   cout << "Vehicle name:" << name << "\n";
+   cout << "vehicle price:" << price << "\n";
+   cout << "\n";
+}
+AVLTree::AVLTree()
+{
+   root = NULL;
+}
+AVLTree::~AVLTree()
+{
+   root = NULL;
+}
+int AVLTree::isEmpty()
+{
+   if(root == NULL)
+      return 1;
+   else
+      return 0;
+}
+AVLTreeNode *AVLTree::LLRotate(AVLTreeNode *k1)
+{
+   AVLTreeNode *k2 = k1 -> left;
+   AVLTreeNode *temp = k2 -> right;
+   k2 -> right = k1;
+   k1 -> left = temp;
+   k1 -> height = max(getHeight(k1 -> left),getHeight(k2 -> right))+1;
+   k2 -> height = max(getHeight(k2 -> left),getHeight(k2 -> right))+1;
+   return k2;
+}
+AVLTreeNode *AVLTree::RRRotate(AVLTreeNode *k1)
+{
+   AVLTreeNode *k2 = k1 -> right;
+   AVLTreeNode *temp = k2 -> left;
+   k2 -> left = k1;
+   k1 -> right = temp;
+   k1 -> height = max(getHeight(k1 -> left),getHeight(k2 -> right))+1;
+   k2 -> height = max(getHeight(k2 -> left),getHeight(k2 -> right))+1;
+   return k2;
+}
+AVLTreeNode *AVLTree::LRRotate(AVLTreeNode *k1)
+{
+   k1 -> left = RRRotate(k1 -> left);
+   return LLRotate(k1);
+}
+AVLTreeNode *AVLTree::RLRotate(AVLTreeNode *k1)
+{
+   k1 -> right = LLRotate(k1 -> right);
+   return RRRotate(k1);
+}
+int AVLTree:: getHeight(AVLTreeNode *myNode)
+{
+   if(myNode == NULL)
+      return -1;
+   return myNode -> height;
+}
+int AVLTree::BF(AVLTreeNode *myNode)
+{
+   if(myNode == NULL)
+      return -1;
+   return getHeight(myNode -> left) - getHeight(myNode -> right);
+}
+void AVLTree::insertion(AVLTreeNode *newNode)
+{
+   root = insert(root,newNode);
+}
+AVLTreeNode *AVLTree::insert(AVLTreeNode *temp, AVLTreeNode *newNode)
+{
+
+   if(root == NULL)
+   {
+      root = newNode;
+      return root;
+   }
+   else if(temp -> num > newNode -> num)
+   {
+      if(temp -> left == NULL)
+         temp -> left = newNode;
+      else
+         temp -> left = insert(temp -> left,newNode);
+   }
+   else if (temp -> num < newNode -> num)
+   {
+      if(temp -> right == NULL)
+         temp -> right = newNode;
+      else
+       temp -> right = insert(temp -> right,newNode);
+   }
+   temp -> height = max(getHeight(temp -> left),getHeight(temp -> right))+1;
+   int balance=BF(temp);
+   if(balance > 1){
+      if(newNode -> num < temp -> left -> num)
+         return LLRotate(temp);
+      else
+         return LRRotate(temp);
+   }
+   if(balance < -1){
+      if(newNode -> num > temp -> right -> num)
+         return RRRotate(temp);
+      else
+         return RLRotate(temp);
+   }
+   return temp;
+}
+
+void AVLTree::inorder(AVLTreeNode *temp)
+{
+   if(temp != NULL)
+   {
+      inorder(temp -> left);
+      temp -> displayDetails();
+      inorder(temp -> right);
+   }
+}
+void AVLTree::preorder(AVLTreeNode *temp)
+{
+   if(temp != NULL)
+   {
+      temp -> displayDetails();
+      preorder(temp -> left);
+      preorder(temp -> right);
+   }
+}
+void AVLTree::postorder(AVLTreeNode *temp)
+{
+   if(temp != NULL)
+   {
+      postorder(temp -> left);
+      postorder(temp -> right);
+      temp -> displayDetails();
+   }
+}
+AVLTreeNode *AVLTree::getRoot()
+{
+   return root;
+}
+AVLTreeNode *AVLTree::search(int key)
+{
+   AVLTreeNode *temp = root;
+   while(temp != NULL)
+   {
+      if(temp -> num == key)
+      {
+         return temp;
+      }
+      else if(key < temp -> num)
+      {
+         temp = temp -> left;
+      }
+      else
+      {
+         temp = temp -> right;
+      }
+   }
+   return NULL;
+}
+AVLTreeNode *AVLTree::findMin(AVLTreeNode *temp)
+{
+   if(temp -> left != NULL)
+      findMin(temp -> left);
+   else
+      temp -> displayDetails();
+}
+AVLTreeNode *AVLTree::findMax(AVLTreeNode *temp)
+{
+   if(temp -> right != NULL)
+      findMax(temp -> right);
+   else
+      temp -> displayDetails();
+}
+int main()
+{
+   int ret,ch;
+   AVLTreeNode *n;
+   AVLTree t;
+   do
+   {
+      cout << "*******************\n";
+      cout << "List of operations \n";
+      cout << "*******************\n";
+      cout << "1.INSERTION\n2.SEARCH\n3.FIND MINIMUM\n4.FIND MAXIMUM\n5.INORDER TRAVAL\n6.PREORDER TRAVAL\n7.POSTORDER TRAVAL\n8.EXIT\n";
+      cout << "**********************\n";
+      cout << "Enter choice :";
+      cin >> ch;
+      cout << "**********************\n";
+      switch(ch)
+      {
+         case 1:
+            AVLTreeNode *r;
+            n=new AVLTreeNode();
+            n->getDetails();
+            t.insertion(n);
+            cout << "~~~~~~~~~~~~~~~~~~~~~\n";
+            if(r == NULL)
+               cout << "INSERTION FAILED\n";
+            else
+               cout << "INSERTION SUCCESS\n";
+            cout << "`~~~~~~~~~~~~~~~~~~~~~\n";
+            t.inorder(t.getRoot());
+            break;
+         case 2:
+            AVLTreeNode *res;
+            int key;
+            cout << "~~~~~~~~~~~~~~~~~\n";
+            cout << "Enter the key to search:";
+            cin >> key;
+            cout << "~~~~~~~~~~~~~~~~~~\n";
+            res = t.search(key);
+            if(res == NULL)
+               cout << "ELement not found.\n";
+            else
+               res -> displayDetails();
+            cout << "~~~~~~~~~~~~~~~~~~~\n";
+            break;
+         case 3:
+            cout << "~~~~~~~~~~~~~~~~~~\n";
+            t.findMin(t.getRoot());
+            cout << "~~~~~~~~~~~~~~~~~~\n";
+            break;
+         case 4:
+            cout << "~~~~~~~~~~~~~~~~~\n";
+            t.findMax(t.getRoot());
+            cout << "~~~~~~~~~~~~~~~~~\n";
+            break;
+         case 5:
+            t.inorder(t.getRoot());
+            cout << "~~~~~~~~~~~~~~~~\n";
+            break;
+         case 6:
+            t.preorder(t.getRoot());
+            cout << "~~~~~~~~~~~~~~\n";
+            break;
+         case 7:
+            t.postorder(t.getRoot());
+            cout << "~~~~~~~~~~~~~~~~\n";
+            break;
+         case 8:
+            cout << "EXITING...\n";
+            cout << "~~~~~~~~~~~~~~~~\n";
+            break;
+         default:
+            return 0;
+      }
+   } while(ch!=8);
+}
+
