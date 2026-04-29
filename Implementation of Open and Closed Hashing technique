@@ -1,0 +1,532 @@
+#include <string>
+using namespace std;
+
+class Node {
+private:
+    int id;
+    string name;
+    float price;
+public:
+    Node();
+    friend class LHash;
+    void getDetails();
+    void displayDetails();
+};
+
+class LHash {
+private:
+    Node* table;
+    int size;
+public:
+    LHash(int c);
+    int hashFunc(int key);
+    int insertItem(Node key);
+    int deleteItem(int key);
+    bool searchItem(int key);
+    void displayTable();
+};
+#include <iostream>
+#include "head.h"
+using namespace std;
+
+Node::Node() {
+    id = -1;  // -1 means empty slot
+    name = "";
+    price = 0.0;
+}
+
+LHash::LHash(int c) {
+    size = c;
+    table = new Node[size];
+    for (int i = 0; i < size; i++) {
+        table[i].id = -1;
+        table[i].name = "";
+        table[i].price = 0.0;
+    }
+}
+
+int LHash::hashFunc(int key) {
+    return key % size;
+}
+
+int LHash::insertItem(Node key) {
+    int index = hashFunc(key.id);
+    int start = index;
+    while (table[index].id != -1) {
+        index = (index + 1) % size;
+        if (index == start) {
+            cout << "Hash table is full. Cannot insert." << endl;
+            return 0;
+        }
+    }
+    table[index] = key;
+    cout << "Inserted at index " << index << endl;
+    return 1;
+}
+
+bool LHash::searchItem(int key) {
+    int index = hashFunc(key);
+    int start = index;
+    while (table[index].id != -1) {
+        if (table[index].id == key) {
+            cout << key << " found at index: " << index << endl;
+            return true;
+        }
+        index = (index + 1) % size;
+        if (index == start)
+            return false;
+    }
+    cout << key << " not found in the hash table." << endl;
+    return false;
+}
+
+int LHash::deleteItem(int key) {
+    int index = hashFunc(key);
+    int start = index;
+    while (table[index].id != -1) {
+        if (table[index].id == key) {
+            table[index].id = -1;
+            table[index].name = "";
+            table[index].price = 0.0;
+            cout << key << " deleted from index " << index << endl;
+            return 1;
+        }
+        index = (index + 1) % size;
+        if (index == start)
+            return 0;
+    }
+    cout << key << " not found to delete." << endl;
+    return 0;
+}
+
+void LHash::displayTable() {
+    cout << "Hash Table [Linear Probing]:" << endl;
+    for (int i = 0; i < size; i++) {
+        if (table[i].id == -1)
+            cout << i << ": [empty node]" << endl;
+        else {
+            cout << i << ": ";
+            table[i].displayDetails();
+            cout << endl;
+        }
+    }
+}
+
+void Node::getDetails() {
+    cout << "Enter id: ";
+    cin >> id;
+    cout << "Enter name: ";
+    cin >> name;
+    cout << "Enter price: ";
+    cin >> price;
+}
+
+void Node::displayDetails() {
+    cout << "id: " << id << ", name: " << name << ", price: " << price;
+}
+#include <iostream>
+#include "head.h"
+using namespace std;
+
+int main() {
+    int size;
+    cout << "Enter size for hash table: ";
+    cin >> size;
+
+    int ch, id;
+    Node key;
+    LHash hash(size);
+
+    do {
+        cout << "\nLinear Probing - Hash Table\n";
+        cout << "1. Insert node\n2. Search node\n3. Delete node\n4. Display\n5. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> ch;
+
+        switch (ch) {
+        case 1:
+            cout << "Node details:\n";
+            key.getDetails();
+            hash.insertItem(key);
+            break;
+        case 2:
+            cout << "Enter id to search: ";
+            cin >> id;
+            hash.searchItem(id);
+            break;
+        case 3:
+            cout << "Enter id to delete: ";
+            cin >> id;
+            hash.deleteItem(id);
+            break;
+        case 4:
+            hash.displayTable();
+            break;
+        case 5:
+            cout << "Exiting...\n";
+            break;
+        default:
+            cout << "Invalid choice!\n";
+        }
+    } while (ch != 5);
+
+    return 0;
+}
+------------------------------------------------------------------------------------------------
+#include <string>
+using namespace std;
+
+class Node {
+public:
+    int id;
+    string name;
+    float price;
+
+    Node();
+    void getDetails();
+    void displayDetails();
+};
+
+class QuadHash {
+private:
+    Node* table;
+    int size;
+public:
+    QuadHash(int c);
+    ~QuadHash();
+    int hashFunction(int key);
+    void insertItem(Node key);
+    void searchItem(int key);
+    void deleteItem(int key);
+    void displayTable();
+};
+#include <iostream>
+#include "head.h"
+using namespace std;
+
+// Node class implementation
+Node::Node() {
+    id = -1;
+    name = "";
+    price = 0.0;
+}
+
+void Node::getDetails() {
+    cout << "Enter ID: ";
+    cin >> id;
+    cout << "Enter name: ";
+    cin.ignore();  // Clear newline for getline
+    getline(cin, name);
+    cout << "Enter price: ";
+    cin >> price;
+}
+
+void Node::displayDetails() {
+    cout << "ID: " << id << ", Name " << name << ", Price: " << price << endl;
+}
+
+// QuadHash class implementation
+QuadHash::QuadHash(int c) {
+    size = c;
+    table = new Node[size];
+    for (int i = 0; i < size; i++) {   // <-- Corrected constructor loop
+        table[i].id = -1;  // Mark as empty
+    }
+}
+
+QuadHash::~QuadHash() {
+    delete[] table;
+}
+
+int QuadHash::hashFunction(int key) {
+    return key % size;
+}
+
+void QuadHash::insertItem(Node key) {
+    int index = hashFunction(key.id);
+    int i = 0;
+    while (i < size) {
+        int newIndex = (index + i * i) % size;
+        if (table[newIndex].id == -1) {  // Empty slot found
+            table[newIndex] = key;
+            cout << "Inserted at index " << newIndex << endl;
+            return;
+        }
+        i++;
+    }
+    cout << "Hash table is full." << endl;
+}
+
+void QuadHash::searchItem(int key) {
+    int index = hashFunction(key);
+    int i = 0;
+    while (i < size) {
+        int newIndex = (index + i * i) % size;
+        if (table[newIndex].id == key) {
+            cout << "Node found at index " << newIndex << ": ";
+            table[newIndex].displayDetails();
+            return;
+        } else if (table[newIndex].id == -1) {
+            break;  // Empty slot means not found
+        }
+        i++;
+    }
+    cout << "Node not found." << endl;
+}
+
+void QuadHash::deleteItem(int key) {
+    int index = hashFunction(key);
+    int i = 0;
+    while (i < size) {
+        int newIndex = (index + i * i) % size;
+        if (table[newIndex].id == key) {
+            table[newIndex].id = -1;  // Mark as deleted (empty)
+            cout << "Deleted node at index " << newIndex << endl;
+            return;
+        } else if (table[newIndex].id == -1) {
+            break;  // Empty slot means not found
+        }
+        i++;
+    }
+    cout << "Node not found." << endl;
+}
+
+void QuadHash::displayTable() {
+    cout << "Hash Table with Quadratic Probing:" << endl;
+    for (int i = 0; i < size; i++) {
+        cout << "Index " << i << ": ";
+        if (table[i].id == -1) {
+            cout << "Empty" << endl;
+        } else {
+            table[i].displayDetails();
+        }
+    }
+}
+#include <iostream>
+#include "head.h"
+using namespace std;
+
+int main() {
+    int size;
+    cout << "Enter size of table: ";
+    cin >> size;
+    QuadHash hash(size);
+
+    int ch;
+    Node key;
+    int id;
+
+    do {
+        cout << "\nQUADRATIC PROBING\n------------------\n";
+        cout << "1. Insert node\n2. Delete node\n3. Search node\n4. Display table\n5. Exit\n";
+        cout << "Enter choice: ";
+        cin >> ch;
+
+        switch (ch) {
+            case 1:
+                cout << "Enter details of node:\n";
+                key.getDetails();
+                hash.insertItem(key);
+                break;
+            case 2:
+                cout << "Enter ID to delete: ";
+                cin >> id;
+                hash.deleteItem(id);
+                break;
+            case 3:
+                cout << "Enter ID to search: ";
+                cin >> id;
+                hash.searchItem(id);
+                break;
+            case 4:
+                hash.displayTable();
+                break;
+            case 5:
+                cout << "Exiting..." << endl;
+                break;
+            default:
+                cout << "Invalid choice. Try again." << endl;
+        }
+    } while (ch != 5);
+
+    return 0;
+}
+-----------------------------------------------------------------------------------------------------
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Node {
+    int id;
+    string name;
+    float mark;
+    Node* next;
+};
+
+class Hash {
+private:
+    int size;
+    Node** table;
+
+public:
+    Hash(int tablesize);
+    int hashFunction(int id);
+    void insertKey(int id, const string& name, float mark);
+    void searchHash(int id);
+    void deleteKey(int id);
+    void displayTable();
+    ~Hash();
+};
+#include "head.h"
+
+Hash::Hash(int tablesize) {
+    size = tablesize;
+    table = new Node*[size];
+    for (int i = 0; i < size; i++)
+        table[i] = NULL;
+}
+
+int Hash::hashFunction(int id) {
+    return id % size;
+}
+
+void Hash::insertKey(int id, const string& name, float mark) {
+    int index = hashFunction(id);
+    Node* newNode = new Node;
+    newNode->id = id;
+    newNode->name = name;
+    newNode->mark = mark;
+    newNode->next = NULL;
+
+    if (table[index] == NULL) {
+        // Empty list, insert as first node
+        table[index] = newNode;
+    } else {
+        // Insert at end to maintain insertion order
+        Node* current = table[index];
+        while (current->next != NULL)
+            current = current->next;
+        current->next = newNode;
+    }
+    cout << "Inserted " << id << " at index " << index << endl;
+}
+
+void Hash::searchHash(int id) {
+    int index = hashFunction(id);
+    Node* current = table[index];
+    while (current != NULL) {
+        if (current->id == id) {
+            cout << "Found at index " << index << ": ";
+            cout << "ID: " << current->id << ", Name: " << current->name << ", Mark: " << current->mark << endl;
+            return;
+        }
+        current = current->next;
+    }
+    cout << "Not Found: " << id << endl;
+}
+
+void Hash::deleteKey(int id) {
+    int index = hashFunction(id);
+    Node* current = table[index];
+    Node* prev = NULL;
+
+    while (current != NULL) {
+        if (current->id == id) {
+            if (prev == NULL)
+                table[index] = current->next;
+            else
+                prev->next = current->next;
+
+            delete current;
+            cout << "Deleted " << id << " from index " << index << endl;
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
+    cout << "Key not found: " << id << endl;
+}
+
+void Hash::displayTable() {
+    cout << "\n--- Hash Table ---\n";
+    for (int i = 0; i < size; i++) {
+        cout << "Index " << i << ": ";
+        Node* current = table[i];
+        while (current != NULL) {
+            cout << "[" << current->id << ", " << current->name << ", " << current->mark << "] -> ";
+            current = current->next;
+        }
+        cout << "NULL" << endl;
+    }
+}
+
+Hash::~Hash() {
+    for (int i = 0; i < size; i++) {
+        Node* current = table[i];
+        while (current != NULL) {
+            Node* temp = current;
+            current = current->next;
+            delete temp;
+        }
+    }
+    delete[] table;
+}
+int main() {
+    int size;
+    cout << "Enter table size: ";
+    cin >> size;
+
+    Hash h(size);
+    int choice, id;
+    string name;
+    float mark;
+
+    do {
+        cout << "\n--- Hash Table Menu ---\n";
+        cout << "1. Insert\n";
+        cout << "2. Search\n";
+        cout << "3. Delete\n";
+        cout << "4. Display\n";
+        cout << "5. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter ID to insert: ";
+                cin >> id;
+                cin.ignore();  // clear newline for getline
+                cout << "Enter Name: ";
+                getline(cin, name);
+                cout << "Enter Mark: ";
+                cin >> mark;
+                h.insertKey(id, name, mark);
+                break;
+
+            case 2:
+                cout << "Enter ID to search: ";
+                cin >> id;
+                h.searchHash(id);
+                break;
+
+            case 3:
+                cout << "Enter ID to delete: ";
+                cin >> id;
+                h.deleteKey(id);
+                break;
+
+            case 4:
+                h.displayTable();
+                break;
+
+            case 5:
+                cout << "Exiting...\n";
+                break;
+
+            default:
+                cout << "Invalid choice!\n";
+        }
+    } while (choice != 5);
+
+    return 0;
+}
