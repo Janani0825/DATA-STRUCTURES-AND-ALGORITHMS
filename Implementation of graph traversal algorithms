@@ -1,0 +1,177 @@
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+class Node {
+private:
+    int id;
+    char name[50];
+    float price;
+
+public:
+    friend class MST;
+    Node();
+    void getDetails(int);
+    void displayDetails();
+};
+
+class MST {
+private:
+    Node* arr;
+    int adjMat[50][50];
+    int noOfVertices;
+    int capacity;
+
+public:
+    MST();
+    ~MST();
+    void createMST();
+    void displayMatrix();
+    void prims();
+};
+#include"head.h"
+Node::Node() {
+    id = 0;
+    strcpy(name, " ");
+    price = 0.0;
+}
+
+void Node::getDetails(int i) {
+    id = i + 1;
+    cout << "Enter product name: ";
+    cin >> name;
+    cout << "Enter product price: ";
+    cin >> price;
+}
+
+void Node::displayDetails() {
+    cout << "product ID: " << id << "\n";
+    cout << "Name: " << name << "\n";
+    cout << "price: " << price << "\n";
+}
+
+MST::MST() {
+    noOfVertices = 0;
+    capacity = 50;
+    arr = new Node[capacity];
+    for (int i = 0; i < 50; i++)
+        for (int j = 0; j < 50; j++)
+            adjMat[i][j] = 0;
+}
+
+MST::~MST() {
+    delete[] arr;
+    arr = NULL;
+    noOfVertices = 0;
+    capacity = 0;
+}
+
+void MST::createMST() {
+    cout << "Enter the number of products: ";
+    cin >> noOfVertices;
+    cout << "-------------------------------------\n";
+
+    for (int i = 0; i < noOfVertices; i++) {
+        cout << "Enter details of product " << i + 1 << ":\n";
+        arr[i].getDetails(i);
+    }
+
+    cout << "\nEnter weighted adjacency matrix (0 if no connection):\n";
+    for (int i = 0; i < noOfVertices; i++) {
+        for (int j = 0; j < noOfVertices; j++) {
+            cout << "Weight between " << arr[i].name << " and " << arr[j].name << ": ";
+            cin >> adjMat[i][j];
+            if (adjMat[i][j] == 0 && i != j)
+                adjMat[i][j] = 9999;
+        }
+    }
+}
+
+void MST::displayMatrix() {
+    cout << "\nAdjacency Matrix:\n";
+    for (int i = 0; i < noOfVertices; i++) {
+        for (int j = 0; j < noOfVertices; j++) {
+            if (adjMat[i][j] == 9999)
+                cout << "--> ";
+            else
+                cout << adjMat[i][j] << " ";
+        }
+        cout << "\n";
+    }
+}
+
+void MST::prims() {
+    if (noOfVertices == 0) {
+        cout << "Please create the graph first!\n";
+        return;
+    }
+
+    int selected[50] = {0};
+    int noOfEdges = 0;
+    int total_cost = 0;
+    selected[0] = 1;
+
+    cout << "\nEdges in the Minimum Spanning Tree:\n";
+    while (noOfEdges < noOfVertices - 1) {
+        int min = 9999;
+        int x = -1, y = -1;
+
+        for (int i = 0; i < noOfVertices; i++) {
+            if (selected[i]) {
+                for (int j = 0; j < noOfVertices; j++) {
+                    if (!selected[j] && adjMat[i][j] < min) {
+                        min = adjMat[i][j];
+                        x = i;
+                        y = j;
+                    }
+                }
+            }
+        }
+
+        if (x != -1 && y != -1) {
+            cout << arr[x].name << " -- " << arr[y].name
+                 << "  ==>  " << adjMat[x][y] << endl;
+            total_cost += adjMat[x][y];
+            selected[y] = 1;
+            noOfEdges++;
+        } else {
+            break;
+        }
+    }
+
+    cout << "Minimum total cost = " << total_cost << "\n";
+}
+int main() {
+    int ch;
+    MST m;
+    do {
+        cout << "\n************************************\n";
+        cout << "Menu:\n";
+        cout << "1. Create product graph\n";
+        cout << "2. Display adjacency matrix\n";
+        cout << "3. Apply Prims algorithm\n";
+        cout << "4. Exit\n";
+        cout << "************************************\n";
+        cout << "Enter your choice: ";
+        cin >> ch;
+
+        switch (ch) {
+            case 1:
+                m.createMST();
+                break;
+            case 2:
+                m.displayMatrix();
+                break;
+            case 3:
+                m.prims();
+                break;
+            case 4:
+                cout << "Exiting...\n";
+                break;
+            default:
+                cout << "Invalid choice! Try again.\n";
+        }
+    } while (ch != 4);
+
+    return 0;
+}
