@@ -1,0 +1,991 @@
+#include <iostream>
+#include <cstring>
+using namespace std;
+class Node {
+private:
+    int pid;
+    char pname[50];
+    float pprice;
+public:
+    friend class A_list;
+    Node();
+    void getDetails();
+    void putDetails();
+    int getId() { return pid; }
+    void updateDetails();
+};
+class A_list {
+public:
+    A_list();
+    ~A_list();
+    int insertAtFirst(Node element);
+    int insertAtLast(Node element);
+    int insertByPosition(Node element, int pos);
+    int deleteFromFront();
+    int deleteFromLast();
+    int deleteByPosition(int pos);
+    int deleteByValue(int id);
+    Node getElementAtPosition(int pos);
+    int searchByElement(int id);
+    int updateElement(int id);
+    void makeListEmpty();
+    int isFull();
+    int isEmpty();
+    void displayArray();
+private:
+    Node *arr;
+    int capacity;
+    int size;
+};
+
+#include "head.h"
+#include <iostream>
+#include <cstring>
+using namespace std;
+Node::Node() {
+    pid = 0;
+    pprice = 0.0;
+    strcpy(pname, "");
+}
+void Node::getDetails() {
+    cout << "\nEnter PRODUCT DETAILS:\n";
+    cout << "ID: ";
+    cin >> pid;
+    cout << "Name: ";
+    cin.ignore();
+    cin.getline(pname, 50);
+    cout << "PRICE: ";
+    cin >> pprice;
+}
+void Node::putDetails() {
+    cout << "\nPRODUCT DETAILS:\n";
+    cout << "ID: " << pid << endl;
+    cout << "Name: " << pname << endl;
+    cout << "Price: " << pprice<< endl;
+}
+void Node::updateDetails() {
+    cout << "\nEnter New Details:\n";
+    cout << "Name "<< pname << endl;
+    cin.ignore();
+    cin.getline(pname, 50);
+    cout << "Price " << pprice << endl;
+    cin >> pprice;
+}
+A_list::A_list() {
+    size = 0;
+    capacity = 20;
+    arr = new Node[capacity];
+}
+A_list::~A_list() {
+    delete[] arr;
+}
+int A_list::isFull() {
+    return size == capacity;
+}
+int A_list::isEmpty() {
+    return size == 0;
+}
+int A_list::insertAtFirst(Node element) {
+    if (!isFull()) {
+        if (isEmpty()) {
+            arr[size++] = element;
+        } else {
+            for (int i = size; i > 0; i--)
+                arr[i] = arr[i-1];
+            arr[0] = element;
+            size++;
+        }
+        return 1;
+    }
+    return 0;
+}
+int A_list::insertAtLast(Node element) {
+    if (!isFull()) {
+        arr[size++] = element;
+        return 1;
+    }
+    return 0;
+}
+int A_list::insertByPosition(Node element, int pos) {
+    if (isFull()) return 0;
+    if (pos < 1 || pos > size+1) return -1;
+
+    if (pos == 1) return insertAtFirst(element);
+    if (pos == size+1) return insertAtLast(element);
+
+    for (int i = size; i >= pos; i--)
+        arr[i] = arr[i-1];
+    arr[pos-1] = element;
+    size++;
+    return 1;
+}
+int A_list::deleteFromFront() {
+    if (isEmpty()) return 0;
+    for (int i = 0; i < size-1; i++)
+        arr[i] = arr[i+1];
+    size--;
+    return 1;
+}
+int A_list::deleteFromLast() {
+    if (isEmpty()) return 0;
+    size--;
+    return 1;
+}
+int A_list::deleteByPosition(int pos) {
+    if (isEmpty()) return 0;
+    if (pos < 1 || pos > size) return -1;
+
+    if (pos == 1) return deleteFromFront();
+    if (pos == size) return deleteFromLast();
+
+    for (int i = pos-1; i < size-1; i++)
+        arr[i] = arr[i+1];
+    size--;
+    return 1;
+}
+int A_list::deleteByValue(int id) {
+    if (isEmpty()) return 0;
+
+    for (int i = 0; i < size; i++) {
+        if (arr[i].pid == id) {
+            for (int j = i; j < size-1; j++)
+                arr[j] = arr[j+1];
+            size--;
+            return 1;
+        }
+    }
+    return -1;
+}
+Node A_list::getElementAtPosition(int pos) {
+    if (pos < 1 || pos > size) {
+        Node emptyNode;
+        return emptyNode;
+    }
+    return arr[pos-1];
+}
+int A_list::searchByElement(int id) {
+    for (int i = 0; i < size; i++) {
+        if (arr[i].pid == id) {
+            return i+1; // Return position (1-based)
+        }
+    }
+    return -1; // Not found
+}
+int A_list::updateElement(int id) {
+    for (int i = 0; i < size; i++) {
+        if (arr[i].pid == id) {
+            arr[i].updateDetails();
+            return 1;
+        }
+    }
+    return 0;
+}
+void A_list::makeListEmpty() {
+    size = 0;
+}
+void A_list::displayArray() {
+    if (isEmpty()) {
+        cout << "List is empty!" << endl;
+        return;
+    }
+
+    cout << "\nPRODUCT DETAILS " << size <<"\n";
+    cout << "**************\n";
+    for (int i = 0; i < size; i++) {
+        cout << i+1 << ":\n";
+        cout << "  ID: " << arr[i].pid << "\n";
+        cout << "  NAME: " << arr[i].pname << "\n";
+        cout << "  PRICE: " << arr[i].pprice << "\n";
+        cout << "**************\n";
+    }
+}
+#include "head.h"
+#include <iostream>
+using namespace std;
+void displayMenu() {
+    cout << "\nPRODUCT DETAILS\n";
+    cout << "1. InsertatFirst\n";
+    cout << "2. InsertatLast\n";
+    cout << "3. InsertnodebyPosition\n";
+    cout << "4. DeleteatFirst\n";
+    cout << "5. DeleteatLast\n";
+    cout << "6. DeletenodebyPosition\n";
+    cout << "7. Deletenodebyvalue\n";
+    cout << "8. searchnodebyPosition\n";
+    cout << "9. SearchnodebyElement\n";
+    cout << "10. Replacenode\n";
+    cout << "11. ClearAllNodes\n";
+    cout << "12. DisplayAllNodes\n";
+    cout << "13. Exit\n";
+    cout << "Enter your choice: ";
+}
+
+int main() {
+    A_list list;
+    int choice, id, pos;
+    Node n;
+
+    do {
+        displayMenu();
+        cin >> choice;
+
+        switch(choice) {
+            case 1:
+                n.getDetails();
+                if(list.insertAtFirst(n))
+                    cout << "Node insert at first successfully\n";
+                else
+                    cout << "List is full\n";
+                break;
+
+            case 2:
+                n.getDetails();
+                if(list.insertAtLast(n))
+                    cout << "Node at end successfully\n";
+                else
+                    cout << "List is full\n";
+                break;
+
+            case 3:
+                n.getDetails();
+                cout << "Enter position: ";
+                cin >> pos;
+                if(list.insertByPosition(n, pos) == 1)
+                    cout << "Node added at position " << pos << " successfully\n";
+                else
+                    cout << "Failed to add Node\n";
+                break;
+
+            case 4:
+                if(list.deleteFromFront())
+                    cout << "First Node deleted successfully\n";
+                else
+                    cout << "List is empty\n";
+                break;
+
+            case 5:
+                if(list.deleteFromLast())
+                    cout << "Last Node deleted successfully\n";
+                else
+                    cout << "List is empty\n";
+                break;
+
+            case 6:
+                cout << "Enter position: ";
+                cin >> pos;
+                if(list.deleteByPosition(pos) == 1)
+                    cout << "Node deleted successfully\n";
+                else
+                    cout << "Failed to delete Node\n";
+                break;
+
+            case 7:
+                cout << "Enter  ID: ";
+                cin >> id;
+                if(list.deleteByValue(id) == 1)
+                    cout << "Node deleted successfully\n";
+                else if(list.deleteByValue(id) == -1)
+                    cout << "Node not found\n";
+                else
+                    cout << "List is empty\n";
+                break;
+
+            case 8:
+                cout << "Enter position: ";
+                cin >> pos;
+                n = list.getElementAtPosition(pos);
+                if(n.getId() != 0) {
+                    cout << "\nNode at position " << pos << ":\n";
+                    n.putDetails();
+                } else {
+                    cout << "Invalid position\n";
+                }
+                break;
+
+            case 9:
+                cout << "Enter ID: ";
+                cin >> id;
+                pos = list.searchByElement(id);
+                if(pos != -1) {
+                    cout << "Node found at position " << pos << endl;
+                    list.getElementAtPosition(pos).putDetails();
+                } else {
+                    cout << "Node not found\n";
+                }
+                break;
+
+            case 10:
+                cout << "Enter  ID to update: ";
+                cin >> id;
+                if(list.updateElement(id))
+                    cout << "Node updated successfully\n";
+                else
+                    cout << "Node  not found\n";
+                break;
+
+            case 11:
+                list.makeListEmpty();
+                cout << "List is empty \n";
+                break;
+
+            case 12:
+                list.displayArray();
+                break;
+
+            case 13:
+                cout << "Exiting program...\n";
+                break;
+
+            default:
+                cout << "Invalid choice\n";
+        }
+
+    } while(choice != 13);
+
+    return 0;
+}
+
+----------------------------------------------------------------------------------------------
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Node {
+private:
+    int productId;
+    string name;
+    float price;
+    Node* next;
+public:
+    friend class L_List;
+    Node();
+    ~Node();
+    void getDetails();
+    void displayDetails();
+    int getProductId()
+    {
+       return productId;
+    }
+};
+
+class L_List {
+private:
+    Node* first;
+public:
+    L_List();
+    ~L_List();
+    int isEmpty();
+    int insertAtFirst(Node* newNode);
+    int insertAtLast(Node* newNode);
+    int insertByPos(Node* newNode, int pos);
+    int insertAfterGivenElement(Node* newNode, int afterId);
+    int insertBeforeGivenElement(Node* newNode, int beforeId);
+    int deleteByProductId(int id);
+    int deleteByPosition(int pos);
+    int deleteAtFirst();
+    int deleteAtLast();
+    int updateByPosition(int pos, int newId, string newName, float newprice);
+    int updateByProductId(int oldId, int newId, string newName, float newprice);
+    int searchByProductId(int id);
+    int searchByPosition(int pos);
+    int displayList();
+    int makeListEmpty();
+};
+#include "head.h"
+using namespace std;
+
+Node :: Node()
+{
+   productId=0;
+   name="";
+   price=0.0f;
+   next=NULL;
+}
+
+Node :: ~Node()
+{
+   next=NULL;
+}
+
+L_List :: L_List()
+{
+   first=NULL;
+}
+
+L_List :: ~L_List()
+{
+   makeListEmpty();
+}
+
+int L_List :: isEmpty()
+{
+   return first == NULL;
+}
+
+void Node::getDetails() {
+    cout << "Enter Product ID: ";
+    cin >> productId;
+    cout << "Enter Name: ";
+    cin >> name;
+    cout << "Enter PRICE: ";
+    cin >> price;
+}
+
+void Node::displayDetails()
+{
+    cout << "PRODUCTID: " << productId << endl;
+    cout << "PRODUCTNAME: " << name << endl;
+    cout << "PRODUCTPRICE: " << price << endl;
+}
+
+int L_List::insertAtFirst(Node* newNode)
+{
+    if (isEmpty())
+    {
+        first = newNode;
+    }
+    else
+    {
+        newNode->next = first;
+        first = newNode;
+    }
+    return 1;
+}
+
+int L_List::insertAtLast(Node* newNode)
+{
+    if (isEmpty())
+    {
+        first = newNode;
+    }
+    else
+    {
+        Node* temp = first;
+        while (temp->next != NULL)
+        {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+    return 1;
+}
+
+int L_List::deleteByProductId(int id)
+{
+    if (isEmpty())
+       return -1;
+    Node* prev = NULL;
+    Node* temp = first;
+    while (temp != NULL && temp->getProductId() != id)
+    {
+        prev = temp;
+        temp = temp->next;
+    }
+    if (temp == NULL)
+       return -2;
+
+    if (prev == NULL)
+    {
+        first = first->next;
+    }
+    else
+    {
+        prev->next = temp->next;
+    }
+    delete temp;
+    return 1;
+}
+
+int L_List::deleteByPosition(int pos)
+{
+    if (isEmpty())
+       return -1;
+    if (pos < 1)
+       return -2;
+    Node* prev = NULL;
+    Node* temp = first;
+    int currentPos = 1;
+    while (temp != NULL && currentPos < pos)
+    {
+        prev = temp;
+        temp = temp->next;
+        currentPos++;
+    }
+    if (temp == NULL)
+       return -2;
+    if (prev == NULL)
+    {
+        first = first->next;
+    }
+    else
+    {
+        prev->next = temp->next;
+    }
+    delete temp;
+    return 1;
+}
+
+int L_List::updateByPosition(int pos, int newId, string newName, float newPrice)
+{
+    if (isEmpty())
+       return -1;
+    Node* temp = first;
+    int currentPos = 1;
+    while (temp != NULL && currentPos < pos)
+    {
+        temp = temp->next;
+        currentPos++;
+    }
+    if (temp == NULL)
+       return -2;
+    temp->productId = newId;
+    temp->name = newName;
+    temp->price = newPrice;
+    return 1;
+}
+
+int L_List::updateByProductId(int oldId, int newId, string newName, float newPrice)
+{
+    if (isEmpty())
+       return -1;
+    Node* temp = first;
+    while (temp != NULL && temp->getProductId() != oldId)
+    {
+        temp = temp->next;
+    }
+    if (temp == NULL)
+       return -2;
+    temp->productId = newId;
+    temp->name = newName;
+    temp->price = newPrice;
+    return 1;
+}
+
+int L_List::searchByProductId(int id)
+{
+    if (isEmpty())
+       return -1;
+    Node* temp = first;
+    int position = 1;
+    while (temp != NULL)
+    {
+        if (temp->getProductId() == id)
+        {
+            return position;
+        }
+        temp = temp->next;
+        position++;
+    }
+    return -2;
+}
+
+int L_List::searchByPosition(int pos)
+{
+    if (isEmpty())
+       return -1;
+    Node* temp = first;
+    int currentPos = 1;
+    while (temp != NULL && currentPos < pos)
+    {
+        temp = temp->next;
+        currentPos++;
+    }
+    if (temp == NULL)
+       return -2;
+    temp->displayDetails();
+    cout << endl;
+    return 1;
+}
+
+int L_List::deleteAtFirst()
+{
+    if (isEmpty())
+       return 0;
+    Node* temp = first;
+    first = first->next;
+    delete temp;
+    return 1;
+}
+
+int L_List::deleteAtLast()
+{
+    if (isEmpty())
+       return 0;
+    if (first->next == NULL) {
+        delete first;
+        first = NULL;
+    }
+    else
+    {
+        Node* prev = NULL;
+        Node* temp = first;
+        while (temp->next != NULL)
+        {
+            prev = temp;
+            temp = temp->next;
+        }
+        prev->next = NULL;
+        delete temp;
+    }
+    return 1;
+}
+
+int L_List::displayList()
+{
+    if (isEmpty())
+    {
+        cout << "List is empty!" << endl;
+        return 0;
+    }
+    Node* temp = first;
+    int count = 1;
+    while (temp != NULL)
+    {
+        cout << count << ". ";
+        temp->displayDetails();
+        cout << endl;
+        temp = temp->next;
+        count++;
+    }
+    return 1;
+}
+
+int L_List::makeListEmpty()
+{
+    Node* temp;
+    while (first != NULL)
+    {
+        temp = first;
+        first = first->next;
+        delete temp;
+    }
+    return 1;
+}
+
+int L_List::insertByPos(Node* newNode, int pos)
+{
+    if (isEmpty() && pos == 1)
+    {
+        first = newNode;
+        return 1;
+    }
+    if (pos < 1)
+       return -2;
+    Node* temp = first;
+    int currentPos = 1;
+    while (temp != NULL && currentPos < pos - 1)
+    {
+        temp = temp->next;
+        currentPos++;
+    }
+    if (temp == NULL)
+       return -2;
+    newNode->next = temp->next;
+    temp->next = newNode;
+    return 1;
+}
+
+int L_List::insertAfterGivenElement(Node* newNode, int afterId)
+{
+    if (isEmpty())
+       return -1;
+    Node* temp = first;
+    while (temp != NULL && temp->getProductId() != afterId)
+    {
+        temp = temp->next;
+    }
+    if (temp == NULL)
+       return -2;
+    newNode->next = temp->next;
+    temp->next = newNode;
+    return 1;
+}
+
+int L_List::insertBeforeGivenElement(Node* newNode, int beforeId)
+{
+    if (isEmpty())
+       return -1;
+    Node* prev = NULL;
+    Node* temp = first;
+    while (temp != NULL && temp->getProductId() != beforeId)
+    {
+        prev = temp;
+        temp = temp->next;
+    }
+    if (temp == NULL)
+       return -2;
+    if (prev == NULL)
+    {
+        newNode->next = first;
+        first = newNode;
+    }
+    else
+    {
+        newNode->next = temp;
+        prev->next = newNode;
+    }
+    return 1;
+}
+
+#include "head.h"
+using namespace std;
+void displayMenu() {
+        cout << "\nPRODUCT  MANAGEMENT SYSTEM\n";
+        cout << "---------------------------------------\n";
+        cout << "1. Insert Product at Beginning\n";
+        cout << "2. Insert Product at End\n";
+        cout << "3. Delete Product by ID\n";
+        cout << "4. Delete Product by Position\n";
+        cout << "5. Update Product by Position\n";
+        cout << "6. Update Product by ID\n";
+        cout << "7. Search Product by ID\n";
+        cout << "8. Search Product by Position\n";
+        cout << "9. Delete First Product\n";
+        cout << "10.Delete Last Product\n";
+        cout << "11.Display All Product\n";
+        cout << "12.Clear All Product Information\n";
+        cout << "13.Insert Product by Position\n";
+        cout << "14.Insert After Given Product\n";
+        cout << "15.Insert Before Given Product\n";
+        cout << "0. Exit\n";
+        cout << "---------------------------------------\n";
+}
+int main()
+{
+    L_List list;
+    int choice, productId, position, newId;
+    string newName;
+    float newPrice;
+    displayMenu();
+    do {
+        cout << "**************************************\n";
+        cout << "Enter your choice (1-15): ";
+        cin >> choice;
+        cout << "**************************************\n";
+        Node* newNode = NULL;
+
+        switch(choice)
+        {
+            case 1:
+                newNode = new Node();
+                cout << "\nEnter Product Details:\n";
+                newNode->getDetails();
+                if(list.insertAtFirst(newNode))
+                {
+                    cout << "\nProduct added at beginning successfully!\n";
+                }
+                else
+                {
+                    cout << "\nOperation failed!\n";
+                    delete newNode;
+                }
+                break;
+
+            case 2:
+                newNode = new Node();
+                cout << "\nEnter Product Details:\n";
+                newNode->getDetails();
+                if(list.insertAtLast(newNode))
+                {
+                    cout << "\nProduct added at end successfully!\n";
+                } else
+                {
+                    cout << "\nOperation failed!\n";
+                    delete newNode;
+                }
+                break;
+
+            case 3:
+                cout << "\nEnter ProductID to delete: ";
+                cin >> productId;
+                switch(list.deleteByProductId(productId))
+                {
+                    case -1: cout << "\nList is empty!\n";
+                             break;
+                    case -2: cout << "\nproduct ID not found!\n";
+                             break;
+                    case 1: cout << "\nproduct deleted successfully!\n";
+                             break;
+                }
+                break;
+
+            case 4:
+                cout << "\nEnter position to delete: ";
+                cin >> position;
+                switch(list.deleteByPosition(position))
+                {
+                    case -1: cout << "\nList is empty!\n";
+                             break;
+                    case -2: cout << "\nInvalid position!\n";
+                             break;
+                    case 1: cout << "\nproduct deleted successfully!\n";
+                             break;
+                }
+                break;
+
+            case 5:
+                cout << "\nEnter position to update: ";
+                cin >> position;
+                cout << "Enter new Product ID: ";
+                cin >> newId;
+                cout << "Enter new Name: ";
+                cin >> newName;
+                cout << "Enter new price: ";
+                cin >> newPrice;
+                switch(list.updateByPosition(position, newId, newName, newPrice))
+                {
+                    case -1: cout << "\nList is empty!\n";
+                             break;
+                    case -2: cout << "\nInvalid position!\n";
+                             break;
+                    case 1: cout << "\nproduct updated successfully!\n";
+                             break;
+                }
+                break;
+
+            case 6:
+                cout << "\nEnter product ID to update: ";
+                cin >> productId;
+                cout << "Enter new product ID: ";
+                cin >> newId;
+                cout << "Enter new Name: ";
+                cin >> newName;
+                cout << "Enter new Price: ";
+                cin >> newPrice;
+                switch(list.updateByProductId(productId, newId, newName, newPrice))
+                {
+                    case -1: cout << "\nList is empty!\n";
+                             break;
+                    case -2: cout << "\nproduct ID not found!\n";
+                             break;
+                    case 1: cout << "\nproduct updated successfully!\n";
+                             break;
+                }
+                break;
+
+            case 7:
+                cout << "\nEnter product ID to search: ";
+                cin >> productId;
+                position = list.searchByProductId(productId);
+                if(position == -1)
+                {
+                    cout << "\nList is empty!\n";
+                }
+                else if(position == -2)
+                {
+                    cout << "\nproduct ID not found!\n";
+                }
+                else
+                {
+                    cout << "\nproduct found at position: " << position << endl;
+                }
+                break;
+
+            case 8:
+                cout << "\nEnter position to search: ";
+                cin >> position;
+                switch(list.searchByPosition(position))
+                {
+                    case -1: cout << "\nList is empty!\n";
+                             break;
+                    case -2: cout << "\nInvalid position!\n";
+                             break;
+                    case 1:
+                             break;
+                }
+                break;
+
+            case 9:
+                switch(list.deleteAtFirst())
+                {
+                    case 0: cout << "\nList is empty!\n";
+                            break;
+                    case 1: cout << "\nFirst product deleted successfully!\n";
+                            break;
+                }
+                break;
+
+            case 10:
+                switch(list.deleteAtLast())
+                {
+                    case 0: cout << "\nList is empty!\n";
+                            break;
+                    case 1: cout << "\nLast product deleted successfully!\n";
+                            break;
+                }
+                break;
+
+            case 11:
+                cout << "\nCurrent Product List:\n";
+                list.displayList();
+                break;
+
+            case 12:
+                list.makeListEmpty();
+                cout << "\nAll product information cleared successfully!\n";
+                break;
+
+            case 13:
+                newNode = new Node();
+                cout << "\nEnter Product Details:\n";
+                newNode->getDetails();
+                cout << "Enter position to insert at: ";
+                cin >> position;
+                switch(list.insertByPos(newNode, position))
+                {
+                    case -1: cout << "\nList is empty but position > 1!\n";
+                             break;
+                    case -2: cout << "\nInvalid position!\n";
+                             break;
+                    case 1: cout << "\nProduct inserted successfully!\n";
+                             break;
+                }
+                break;
+
+            case 14:
+                newNode = new Node();
+                cout << "\nEnter product Details:\n";
+                newNode->getDetails();
+                cout << "Enter product ID after which to insert: ";
+                cin >> productId;
+                switch(list.insertAfterGivenElement(newNode,productId))
+                {
+                    case -1: cout << "\nList is empty!\n";
+                             break;
+                    case -2: cout << "\nproduct ID not found!\n";
+                             break;
+                    case 1: cout << "\nproduct inserted successfully!\n";
+                             break;
+                }
+                break;
+
+            case 15:
+                newNode = new Node();
+                cout << "\nEnter product Details:\n";
+                newNode->getDetails();
+                cout << "Enter product ID before which to insert: ";
+                cin >> productId;
+                switch(list.insertBeforeGivenElement(newNode, productId))
+                {
+                    case -1: cout << "\nList is empty!\n";
+                             break;
+                    case -2: cout << "\nproduct ID not found!\n";
+                             break;
+                    case 1: cout << "\nproduct inserted successfully!\n";
+                            break;
+                }
+                break;
+
+            case 0:
+                cout << "\nExiting program...\n";
+                break;
+
+            default:
+                cout << "\nInvalid choice! Please try again.\n";
+        }
+
+    } while(choice != 0);
+
+    return 0;
+}
+
