@@ -1,0 +1,424 @@
+#include <iostream>
+#include <string.h>
+using namespace std;
+class Node
+{
+   private:
+      int num;
+      char name[20];
+      float price;
+   public:
+      friend class A_Stack;
+      Node();
+      void getDetails();
+      void displayDetails();
+};
+class A_Stack
+{
+   private:
+      Node *stackArr;
+      int capacity;
+      int top;
+   public:
+      A_Stack();
+      ~A_Stack();
+      int push(Node);
+      int isFull();
+      int isEmpty();
+      int displayStack();
+      int pop();
+      int peek();
+      int size();
+      int makeStackEmpty();
+};
+#include "head.h"
+Node::Node()
+{
+   num = 0;
+   strcpy(name," ");
+   price = 0.0;
+}
+void Node::getDetails()
+{
+   cout << "Enter product num:";
+   cin >> num;
+   cout << "Enter product name:";
+   cin >> name;
+   cout << "Enter product price:";
+   cin >> price;
+}
+void Node::displayDetails()
+{
+   cout << "Product number:" << num << "\n";
+   cout << "Product name:" << name << "\n";
+   cout << "Product price:Rs" << price << "\n";
+}
+A_Stack::A_Stack()
+{
+   capacity = 10;
+   top = -1;
+   stackArr = new Node[capacity];
+}
+A_Stack::~A_Stack()
+{
+   capacity = 0;
+   top = -1;
+   delete[] stackArr;
+   stackArr = NULL;
+}
+int A_Stack::isFull()
+{
+   if(top+1 == capacity)
+      return 1;
+   else
+      return 0;
+}
+int A_Stack::isEmpty()
+{
+   if(top == -1)
+      return 1;
+   else
+      return 0;
+}
+int A_Stack::push(Node elt)
+{
+   if(!isFull())
+   {
+      top++;
+      stackArr[top] = elt;
+      return 1;
+   }
+   else
+      return 0;
+}
+int A_Stack::pop()
+{
+   if(!isEmpty())
+   {
+      top--;
+      return 1;
+   }
+   else
+      return 0;
+}
+int A_Stack::displayStack()
+{
+   if(!isEmpty())
+   {
+      for(int i=0;i<=top;i++)
+      {
+         cout << "Product number:" << stackArr[i].num << "\n";
+         cout << "Product name:" << stackArr[i].name << "\n";
+         cout << "Product price:Rs" << stackArr[i].price << "\n";
+         cout << "\n";
+      }
+      return 1;
+   }
+   else
+      return 0;
+}
+int A_Stack::peek()
+{
+   if(!isEmpty())
+      stackArr[top].displayDetails();
+   else
+      return 0;
+}
+int A_Stack::size()
+{
+   if(!isEmpty())
+      return top+1;
+   else
+      return 0;
+}
+int A_Stack::makeStackEmpty()
+{
+   while(!isEmpty())
+   {
+      top--;
+   }
+   return 1;
+}
+int main()
+{
+   int ret,ch;
+   Node n;
+   A_Stack s;
+   do {
+      cout << "**************************************\n";
+      cout << "PRODUCT MANAGEMENT SYSTEM\n";
+      cout << "**************************************\n";
+      cout << "1.Push\n2.Pop\n3.Peek\n4.Size\n5.Make stack empty\n6.Exit\n";
+      cout << "**************************************\n";
+      cout << "Enter your choice:";
+      cin >> ch;
+      cout << "**************************************\n";
+      switch(ch)
+      {
+         case 1:
+            n.getDetails();
+            ret = s.push(n);
+            cout << "**************************************\n";
+            if(ret == 1)
+               cout << "Push Success.\n";
+            else
+               cout << "Push Failed.\n";
+            cout << "**************************************\n";
+            s.displayStack();
+            break;
+         case 2:
+            ret = s.pop();
+            cout << "**************************************\n";
+            if(ret == 1)
+               cout << "Pop Success.\n";
+            else
+               cout << "Stack empty.\n";
+            cout << "**************************************\n";
+            s.displayStack();
+            break;
+         case 3:
+            ret = s.peek();
+            cout << "**************************************\n";
+            if(ret == 0)
+               cout << "Stack empty.\n";
+            else
+               cout << "Peek Success.\n";
+            cout << "**************************************\n";
+            break;
+         case 4:
+            ret = s.size();
+            cout << "**************************************\n";
+            if(ret == 0)
+               cout << "Stack empty.\n";
+            else
+               cout << "Size of the stack:" << ret << "\n";
+            cout << "**************************************\n";
+            break;
+         case 5:
+            ret = s.makeStackEmpty();
+            cout << "**************************************\n";
+            if(ret == 1)
+               cout << "Stack is made empty.\n";
+            cout << "**************************************\n";
+            break;
+         case 6:
+            cout << "Exiting...\n";
+            cout << "**************************************\n";
+            return 0;
+         default:
+            cout << "Invalid choice.\n";
+      }
+   }while(ch!=6);
+}
+------------------------------------------------------------------------------------------------------
+#include <iostream>
+#include <string.h>
+using namespace std;
+class Node
+{
+   private:
+      int num;
+      char name[50];
+      float price;
+      Node *next;
+   public:
+      friend class L_Stack;
+      Node();
+      void getDetails();
+      void displayDetails();
+};
+class L_Stack
+{
+   private:
+      Node *top;
+   public:
+      L_Stack();
+      ~L_Stack();
+      int isEmpty();
+      int push(Node *);
+      int displayStack();
+      int pop();
+      int peek();
+      int size();
+      int makeStackEmpty();
+};
+#include "head.h"
+Node::Node()
+{
+   num = 0;
+   strcpy(name," ");
+   price = 0.0;
+   next = NULL;
+}
+void Node::getDetails()
+{
+   cout << "Enter product number:";
+   cin >> num;
+   cout << "Enter product name:";
+   cin >> name;
+   cout << "Enter product price:";
+   cin >> price;
+}
+void Node::displayDetails()
+{
+   cout << "Product number:" << num << "\n";
+   cout << "Product name:" << name << "\n";
+   cout << "Product price:" << price << "\n";
+}
+L_Stack::L_Stack()
+{
+   top = NULL;
+}
+L_Stack::~L_Stack()
+{
+   top = NULL;
+}
+int L_Stack::isEmpty()
+{
+   if(top == NULL)
+      return 1;
+   else
+      return 0;
+}
+int L_Stack::push(Node *newNode)
+{
+   if(isEmpty())
+   {
+      top = newNode;
+   }
+   else
+   {
+      newNode -> next = top;
+      top = newNode;
+   }
+   return 1;
+}
+int L_Stack::displayStack()
+{
+   Node *temp = top;
+   while(temp -> next != NULL)
+   {
+      cout << "Product number:" << temp -> num << "\n";
+      cout << "Product name:" << temp -> name << "\n";
+      cout << "Product price:Rs" << temp -> price << "\n";
+      cout << "\n";
+      temp = temp -> next;
+   }
+   cout << "Product number:" << temp -> num << "\n";
+   cout << "Product name:" << temp -> name << "\n";
+   cout << "Product price:Rs" << temp -> price << "\n";
+}
+int L_Stack::pop()
+{
+   if(isEmpty())
+      return 0;
+   else
+   {
+      Node *temp = top;
+      temp -> displayDetails();
+      top = top -> next;
+      delete temp;
+      temp = NULL;
+      return 1;
+   }
+}
+int L_Stack::peek()
+{
+   if(!isEmpty())
+      top -> displayDetails();
+   else
+      return 0;
+}
+int L_Stack::size()
+{
+   Node *temp = top;
+   int count = 0;
+   while(temp -> next != NULL)
+   {
+      count ++;
+      temp = temp -> next;
+   }
+   count ++;
+   return count;
+}
+int L_Stack::makeStackEmpty()
+{
+   Node *temp = top;
+   while(temp != NULL)
+   {
+     top = top -> next;
+     delete temp;
+     temp = top;
+   }
+   top = NULL;
+   return 1;
+}
+int main()
+{
+   int ret,ch;
+   Node *n;
+   L_Stack s;
+   do {
+      cout << "**************************************\n";
+      cout << "PRODUCT MANAGEMENT SYSTEM\n";
+      cout << "**************************************\n";
+      cout << "1.Push\n2.Pop\n3.Peek\n4.Size\n5.Make stack empty\n6.Exit\n";
+      cout << "**************************************\n";
+      cout << "Enter your choice:";
+      cin >> ch;
+      cout << "**************************************\n";
+      switch(ch)
+      {
+         case 1:
+            n = new Node;
+            n -> getDetails();
+            cout << "**************************************\n";
+            ret = s.push(n);
+            cout << "**************************************\n";
+            if(ret == 1)
+               cout << "Push Success.\n";
+            else
+               cout << "Push Failed.\n";
+            cout << "**************************************\n";
+            s.displayStack();
+            break;
+         case 2:
+            ret = s.pop();
+            cout << "**************************************\n";
+            if(ret == 1)
+               cout << "Pop Success.\n";
+            else
+               cout << "Stack empty.\n";
+            cout << "**************************************\n";
+            break;
+         case 3:
+            ret = s.peek();
+            cout << "**************************************\n";
+            if(ret == 0)
+               cout << "Stack empty.\n";
+            else
+               cout << "Peek Success.\n";
+            cout << "**************************************\n";
+            break;
+         case 4:
+            ret = s.size();
+            cout << "**************************************\n";
+            cout << "Size of the stack:" << ret << "\n";
+            cout << "**************************************\n";
+            break;
+         case 5:
+            ret = s.makeStackEmpty();
+            cout << "**************************************\n";
+            if(ret == 1)
+               cout << "Stack is made empty.\n";
+            cout << "**************************************\n";
+            break;
+         case 6:
+            cout << "Exiting...\n";
+            cout << "**************************************\n";
+            return 0;
+         default:
+            cout << "Invalid choice.\n";
+      }
+   }while(ch!=6);
+}
