@@ -1,0 +1,464 @@
+#include <iostream>
+#include <string.h>
+using namespace std;
+class Node
+{
+   private:
+      int num;
+      char name[50];
+      float price;
+   public:
+      friend class C_Queue;
+      Node();
+      void getDetails();
+      void displayDetails();
+};
+class C_Queue
+{
+   private:
+      Node *arr;
+      int capacity;
+      int front;
+      int rear;
+   public:
+      C_Queue();
+      ~C_Queue();
+      int isFull();
+      int isEmpty();
+      int enqueue(Node);
+      int displayQueue();
+      int dequeue();
+      int peek();
+      int size();
+      int makeStackEmpty();
+};
+#include "head.h"
+Node::Node()
+{
+   num = 0;
+   strcpy(name," ");
+   price = 0.0;
+}
+void Node::getDetails()
+{
+   cout << "Enter product number:";
+   cin >> num;
+   cout << "Enter product name:";
+   cin >> name;
+   cout << "Enter product price:";
+   cin >> price;
+}
+void Node::displayDetails()
+{
+   cout << "Product number:" << num << "\n";
+   cout << "Product name:" << name << "\n";
+   cout << "Product price:" << price << "\n";
+}
+C_Queue::C_Queue()
+{
+   capacity = 50;
+   front = -1;
+   rear = -1;
+   arr = new Node[capacity];
+}
+C_Queue::~C_Queue()
+{
+   capacity = 0;
+   front =-1;
+   rear = -1;
+   delete[] arr;
+   arr = NULL;
+}
+int C_Queue::isFull()
+{
+   if(((rear + 1) % capacity) == front)
+      return 1;
+   else
+      return 0;
+}
+int C_Queue::isEmpty()
+{
+   if(front == -1 && rear == -1)
+      return 1;
+   else
+      return 0;
+}
+int C_Queue::enqueue(Node newNode)
+{
+   if(!isFull())
+   {
+      if(isEmpty())
+      {
+         front = 0;
+         rear = 0;
+         arr[rear] = newNode;
+      }
+      else
+      {
+         rear = (rear + 1) % capacity;
+         arr[rear] = newNode;
+      }
+      return 1;
+   }
+   else
+      return 0;
+}
+int C_Queue::displayQueue()
+{
+   int i;
+   if(!isEmpty())
+   {
+      for(i=front;i!=rear;i=(i+1)%capacity)
+      {
+         cout << "Product number:" << arr[i].num << "\n";
+         cout << "Product name:" << arr[i].name << "\n";
+         cout << "Product priceRs:" << arr[i].price << "\n";
+         cout << "\n";
+      }
+      cout << "product number:" << arr[i].num << "\n";
+      cout << "Product name:" << arr[i].name << "\n";
+      cout << "Product price:Rs" << arr[i].price << "\n";
+   }
+}
+int C_Queue::dequeue()
+{
+   if(!isEmpty())
+   {
+      if(front == rear)
+      {
+         front = -1;
+         rear = -1;
+      }
+      else
+         front = (front+1)%capacity;
+      return 1;
+   }
+   else
+      return 0;
+}
+int C_Queue::peek()
+{
+   if(!isEmpty())
+   {
+      arr[front].displayDetails();
+   }
+   else
+      return 0;
+}
+int C_Queue::size()
+{
+   if(!isEmpty())
+   {
+      int count = 0;
+      for(int i=front;i!=rear;i=(i+1)%capacity)
+      {
+         count++;
+      }
+      count++;
+      return count;
+   }
+   else
+      return 0;
+}
+int C_Queue::makeStackEmpty()
+{
+   while(!isEmpty())
+   {
+      dequeue();
+   }
+   return 1;
+}
+int main()
+{
+   int ret,ch;
+   Node n;
+   C_Queue q;
+   do
+   {
+      cout << "***********************************\n";
+      cout << "List of operations to be performed.\n";
+      cout << "***********************************\n";
+      cout << "1.Enqueue\n2.Dequeue\n3.Peek\n4.Size\n5.Make queue empty\n6.Exit\n";
+      cout << "***********************************\n";
+      cout << "Enter your choice:";
+      cin >> ch;
+      cout << "***********************************\n";
+      switch (ch)
+      {
+         case 1:
+            n.getDetails();
+            ret = q.enqueue(n);
+            cout << "***********************************\n";
+            if(ret == 1)
+               cout << "Enqueue Success.\n";
+            else
+               cout << "Enqueue Failed.\n";
+            cout << "***********************************\n";
+            q.displayQueue();
+            break;
+         case 2:
+            ret = q.dequeue();
+            cout << "***********************************\n";
+            if(ret == 1)
+               cout << "Dequeue Success.\n";
+            else
+               cout << "Dequeue Failed.\n";
+            cout << "***********************************\n";
+            q.displayQueue();
+            break;
+         case 3:
+            ret = q.peek();
+            cout << "***********************************\n";
+            if(ret == 0)
+               cout << "Peek Failed.\n";
+            else
+               cout << "Peek Success.\n";
+            cout << "***********************************\n";
+            break;
+         case 4:
+            ret = q.size();
+            cout << "***********************************\n";
+            if(ret == 0)
+               cout << "Queue is empty.\n";
+            else
+               cout << "Size of the queue is " << ret << "\n";
+            cout << "***********************************\n";
+            break;
+         case 5:
+            ret = q.makeStackEmpty();
+            cout << "***********************************\n";
+            if(ret == 1)
+               cout << "Queue is made empty.\n";
+            cout << "***********************************\n";
+            break;
+         case 6:
+            cout << "Exiting...\n";
+            cout << "***********************************\n";
+            break;
+         default:
+            return 0;
+      }
+   }while(ch!=6);
+}
+----------------------------------------------------------------------------------------
+#include <iostream>
+#include <string.h>
+using namespace std;
+class Node
+{
+   private:
+      int num;
+      char name[50];
+      float price;
+      Node *next;
+   public:
+      friend class L_Queue;
+      Node();
+      void getDetails();
+      void displayDetails();
+};
+class L_Queue
+{
+   private:
+      Node *front;
+   public:
+      L_Queue();
+      ~L_Queue();
+      int isEmpty();
+      int enqueue(Node *);
+      int displayQueue();
+      int dequeue();
+      int peek();
+      int size();
+      int makeQueueEmpty();
+};
+#include "head.h"
+Node::Node()
+{
+   num = 0;
+   strcpy(name," ");
+   price = 0.0;
+   next = NULL;
+}
+void Node::getDetails()
+{
+   cout << "Enter product number:";
+   cin >> num;
+   cout << "Enter product name:";
+   cin >> name;
+   cout << "Enter product price:";
+   cin >> price;
+}
+void Node::displayDetails()
+{
+   cout << "Product number:" << num << "\n";
+   cout << "Product name:" << name << "\n";
+   cout << "Product price:" << price << "\n";
+   cout << "\n";
+}
+L_Queue::L_Queue()
+{
+   front = NULL;
+}
+L_Queue::~L_Queue()
+{
+   front = NULL;
+}
+int L_Queue::isEmpty()
+{
+   if(front == NULL)
+      return 1;
+   else
+      return 0;
+}
+int L_Queue::enqueue(Node *newNode)
+{
+   if(isEmpty())
+   {
+      front = newNode;
+   }
+   else
+   {
+      Node *temp = front;
+      while(temp -> next != NULL)
+      {
+         temp = temp -> next;
+      }
+      temp -> next = newNode;
+   }
+   return 1;
+}
+int L_Queue::displayQueue()
+{
+   if(!isEmpty())
+   {
+      Node *temp = front;
+      while(temp -> next != NULL)
+      {
+         cout << "Product number:" << temp -> num << "\n";
+         cout << "Product name:" << temp -> name << "\n";
+         cout << "Product price:Rs" << temp -> price << "\n";
+         cout << "\n";
+         temp = temp -> next;
+      }
+      cout << "Product number:" << temp -> num << "\n";
+      cout << "Product name:" << temp -> name << "\n";
+      cout << "Product price:Rs" << temp -> price << "\n";
+   }
+   else
+      cout << "After deletion queue become empty.\n";
+}
+int L_Queue::dequeue()
+{
+   if(isEmpty())
+      return 0;
+   else
+   {
+      Node *temp = front;
+      front = front -> next;
+      delete temp;
+      temp = NULL;
+   }
+   return 1;
+}
+int L_Queue::peek()
+{
+   if(!isEmpty())
+   {
+      cout << "Product number:" << front -> num << "\n";
+      cout << "Product name:" << front -> name << "\n";
+      cout << "Product price:" << front -> price << "\n";
+      return 1;
+   }
+   else
+      return 0;
+}
+int L_Queue::size()
+{
+   Node *temp = front;
+   int count = 0;
+   while(temp -> next != NULL)
+   {
+      count++;
+      temp = temp -> next;
+   }
+   count++;
+   return count;
+}
+int L_Queue::makeQueueEmpty()
+{
+   while(!isEmpty())
+   {
+      dequeue();
+   }
+   return 1;
+}
+int main()
+{
+   int ret,ch;
+   Node *n;
+   L_Queue l;
+   do
+   {
+      cout << "*************************************\n";
+      cout << "List of operations to be performed.\n";
+      cout << "*************************************\n";
+      cout << "1.Enqueue\n2.Dequeue\n3.Peek\n4.Size\n5.Make stack empty\n6.Exit\n";
+      cout << "*************************************\n";
+      cout << "Enter your choice:";
+      cin >> ch;
+      cout << "*************************************\n";
+      switch(ch)
+      {
+         case 1:
+            n = new Node;
+            n -> getDetails();
+            ret = l.enqueue(n);
+            cout << "*************************************\n";
+            if(ret == 1)
+               cout << "Enqueue Success.\n";
+            else
+               cout << "Enqueue Failed.\n";
+            cout << "*************************************\n";
+            l.displayQueue();
+            break;
+         case 2:
+            ret = l.dequeue();
+            cout << "*************************************\n";
+            if(ret == 1)
+               cout << "Dequeue Success.\n";
+            else
+               cout << "Dequeue Failed.\n";
+            cout << "*************************************\n";
+            l.displayQueue();
+            break;
+         case 3:
+            ret = l.peek();
+            cout << "*************************************\n";
+            if(ret == 1)
+               cout << "Peek Success.\n";
+            else
+               cout << "Peek Failed.\n";
+            cout << "*************************************\n";
+            break;
+         case 4:
+            ret = l.size();
+            cout << "*************************************\n";
+            cout << "Size of the queue is " << ret << "\n";
+            cout << "*************************************\n";
+            break;
+         case 5:
+            ret = l.makeQueueEmpty();
+            cout << "*************************************\n";
+            if(ret == 1)
+               cout << "Queue is made empty.\n";
+            cout << "*************************************\n";
+            break;
+         case 6:
+            cout << "Exiting...\n";
+            cout << "*************************************\n";
+         default:
+            return 0;
+      }
+   }while(ch!=6);
+}
