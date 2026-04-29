@@ -1,0 +1,166 @@
+#include<iostream>
+using namespace std;
+
+class Node {
+   private:
+      int id;
+      char name[50];
+      float price;
+   public:
+      friend class Heap;
+      Node();
+      void getDetails();
+      void putDetails();
+};
+
+class Heap {
+   public:
+      Heap();
+      ~Heap();
+      int insert(Node x);
+      Node deletemin();
+      int isFull();
+      int isEmpty();
+      void display();
+   private:
+      Node *arr;
+      int capacity;
+      int size;
+};
+#include"head.h"
+#include<iostream>
+#include<cstring>
+using namespace std;
+
+Node::Node() {
+   id = 0;
+   price = 0.0;
+   strcpy(name, "");
+}
+
+void Node::getDetails() {
+   cout << "\nEnter Product Details:\n";
+   cout << "Product id: ";
+   cin >> id;
+   cout << "Product name: ";
+   cin >> name;
+   cout << "Product price: ";
+   cin >> price;
+}
+
+void Node::putDetails() {
+   cout << "Product Id: " << id << "\nProduct Name :" << name << "\nProduct price:" << price << endl;
+}
+
+Heap::Heap() {
+   size = 0;
+   capacity = 20;
+   arr = new Node[capacity + 1];
+}
+
+Heap::~Heap() {
+   delete[] arr;
+}
+
+int Heap::isFull() {
+   return size == capacity;
+}
+
+int Heap::isEmpty() {
+   return size == 0;
+}
+
+int Heap::insert(Node x) {
+   if (isFull()) {
+      cout << "Heap is full.\n";
+      return 0;
+   }
+   int i;
+   for (i = ++size; i != 1 && x.id < arr[i / 2].id; i /= 2) {
+      arr[i] = arr[i / 2];
+   }
+   arr[i] = x;
+   return 1;
+}
+
+Node Heap::deletemin() {
+   if (isEmpty()) {
+      cout << "Heap is empty.\n";
+      return Node();
+   }
+   Node deleteElt = arr[1];
+   Node lastElt = arr[size--];
+   int i, child;
+   for (i = 1; i * 2 <= size; i = child) {
+      child = i * 2;
+      if (child != size && arr[child + 1].id < arr[child].id)
+         child++;
+      if (lastElt.id > arr[child].id)
+         arr[i] = arr[child];
+      else
+         break;
+   }
+   arr[i] = lastElt;
+   return deleteElt;
+}
+
+void Heap::display() {
+   if (isEmpty()) {
+      cout << "Heap is Empty.\n";
+      return;
+   }
+   cout << "*************************";
+   cout << "\nPRODUCT DETAILS\n";
+   for (int i = 1; i <= size; i++) {
+      arr[i].putDetails();
+   }
+   cout << "***********************";
+}
+#include<iostream>
+using namespace std;
+
+void displayMenu() {
+   cout << "\nPRODUCT DETAILS:\n";
+   cout << "\n";
+   cout << "1. Insert Minimum Priority \n";
+   cout << "2. Delete Minimum Priority  \n";
+   cout << "3. Display Products with Minimum priority oder\n";
+   cout << "4. Exit\n";
+   cout << "\n";
+}
+
+int main() {
+   Heap p;
+   Node n;
+   int choice;
+
+   do {
+      displayMenu();
+      cout << "Enter your choice: ";
+      cin >> choice;
+
+      switch(choice) {
+         case 1:
+            n.getDetails();
+            p.insert(n);
+            p.display();
+            break;
+         case 2:
+            n = p.deletemin();
+            cout << "\nDeleted Minimum Priority :\n";
+            n.putDetails();
+            break;
+         case 3:
+            p.display();
+            break;
+         case 4:
+            cout << "Exiting...\n";
+            break;
+         default:
+            cout << "Invalid choice. Try again.\n";
+      }
+   } while(choice != 4);
+
+   return 0;
+}
+
